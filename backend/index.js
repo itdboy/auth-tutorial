@@ -6,14 +6,16 @@ import authRoutes from './routes/auth.route.js';
 
 dotenv.config();
 
-const app = express();
-const PORT = process.env.PORT || 5000;
+const app = express(); // Create an instance of Express application
+const PORT = process.env.PORT || 5000; // Set the port from environment variables or default to 5000
+
+app.use(express.json()); // Middleware to parse JSON bodies 
 
 app.get('/', (req, res) => {
     res.send('Hello, World 555!');
 })
 
-app.use("/api/auth", authRoutes)
+app.use("/api/auth", authRoutes) // Use the auth routes for authentication-related endpoints
 
 app.listen(PORT, () => {
     connectDB()
