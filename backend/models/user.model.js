@@ -16,14 +16,4 @@ const userSchema = new mongoose.Schema(
 export const User = mongoose.model("User", userSchema);
 
 export default User;
-
-// export default User;
-// export const createUser = async (userData) => {
-//     try {
-//         const user = new User(userData);
-//         await user.save();
-//         return user;
-//     } catch (error) {
-//         throw new Error("Error creating user: " + error.message);
-//     }
-// };
+ 

@@ -1,7 +1,8 @@
 import bcryptjs from "bcryptjs";
 
-import { generateTokenAndSetCookie } from "../utils/generateTokenAndSetCookie.js"; 
+import { generateTokenAndSetCookie } from "../utils/generateTokenAndSetCookie.js";
 import User from "../models/user.model.js";
+import { sendVerificationEmail, sendWelcomeEmail } from "../mailtrap/emails.js";
 
 export const signup = async (req, res) => {
   try {
@@ -38,7 +39,8 @@ export const signup = async (req, res) => {
 
     //jwt
     generateTokenAndSetCookie(res, user._id); // Simulate JWT generation and response
-
+  
+    await  sendVerificationEmail(user.email,   verificationToken); // Simulate sending verification email
     // If signup is successful
     res.status(201).json({
       success: true,
@@ -58,6 +60,34 @@ export const login = (req, res) => {
   res.send("Login Controller");
 };
 
-export const logout = (req, res) => {
-  res.send("Logout Controller");
+export const logout = async (req, res) => {
+   res.clearCookie("token")
+   res.status(200).json({ message: "Logged out successfully" });
+};
+
+export const verifyEmail = async (req, res) => { 
+  // Simulate email verification logic
+  const {code}  = req.body; // Get the verification code from the request body
+  try {
+    const user = await User.findOne({
+      verificationToken: code, // Find user by verification token
+      verificationExpiresAt: { $gt: Date.now() }, // Check if the token is still valid
+    });
+
+    if(!user) {
+      return res.status(400).json({ error: "Invalid or expired verification code" });
+    }
+
+    user.isVerified = true;
+    user.verificationToken = null;
+    user.verificationExpiresAt = null;
+    await user.save();
+
+    await sendWelcomeEmail(user.email, user.name); // Simulate sending a welcome email
+      
+    res.status(200).json({ message: "Email verified successfully" });
+  } catch (error) {
+    console.error("Email verification error:", error);
+    res.status(500).json({ error: "Internal server error" });   
+  }
 };
