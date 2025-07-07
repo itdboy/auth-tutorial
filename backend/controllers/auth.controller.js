@@ -1,9 +1,9 @@
 import bcryptjs from "bcryptjs";
-
+import crypto from "crypto";
 import { generateTokenAndSetCookie } from "../utils/generateTokenAndSetCookie.js";
 import User from "../models/user.model.js";
-import { sendVerificationEmail, sendWelcomeEmail } from "../mailtrap/emails.js";
-
+import { sendVerificationEmail, sendWelcomeEmail , sendPasswordResetEmail} from "../mailtrap/emails.js";
+ 
 export const signup = async (req, res) => {
   try {
     // Simulate user signup logic
@@ -86,8 +86,55 @@ export const verifyEmail = async (req, res) => {
     await sendWelcomeEmail(user.email, user.name); // Simulate sending a welcome email
       
     res.status(200).json({ message: "Email verified successfully" });
+
   } catch (error) {
     console.error("Email verification error:", error);
     res.status(500).json({ error: "Internal server error" });   
+  }
+};
+
+export const forgotPassword = async (req, res) => {
+  // Simulate forgot password logic
+  const { email } = req.body; // Get the email from the request body
+  try {
+    const user = await User.findOne({ email });
+    if (!user) {
+      return res.status(404).json({ error: "User not found" });
+    }
+
+    
+    //gererate reset token 
+    const resetToken = crypto.randomBytes(20).toString("hex");
+   
+    const resetTokenExpiresAt = Date.now() + 1 * 60 * 60 * 1000; // Token valid for 1 hour
+    
+    user.resetPasswordToken = resetToken ;
+    user.resetPasswordExpiresAt = resetTokenExpiresAt; // Set the reset token expiration time
+
+     
+    await user.save();
+
+    // Send password reset email (simulated)
+    await sendPasswordResetEmail(user.email, `${process.env.CLIENT_URL}/reset-password/${resetToken}`);
+
+    res.status(200).json({ message: "Password reset email sent" });
+  } catch (error) {
+    console.error("Forgot password error:", error);
+    res.status(500).json({ error: "Internal server error" });
+  }
+};
+
+
+export const resetPassword = async (req, res) => {
+  try {
+    const { token } = req.params; // Get the reset token from the request parameters
+
+    const {password} = req.body;
+
+    const user = await User.findOne({password});
+
+
+  } catch (error) {
+    
   }
 };
