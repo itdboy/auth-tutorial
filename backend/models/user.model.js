@@ -9,6 +9,8 @@ const userSchema = new mongoose.Schema(
     isVerified: { type: Boolean, default: false },
     verificationToken: { type: String, default: null },
     verificationExpiresAt: { type: Date, default: null },
+    resetPasswordToken: String,
+    resetPasswordExpiresAt: Date,
   },
   { timestamps: true }
 );
@@ -16,4 +18,3 @@ const userSchema = new mongoose.Schema(
 export const User = mongoose.model("User", userSchema);
 
 export default User;
- 
