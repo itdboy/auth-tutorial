@@ -61,8 +61,45 @@ export const signup = async (req, res) => {
   }
 };
 
-export const login = (req, res) => {
-  res.send("Login Controller");
+export const login = async (req, res) => {
+  const { email, password } = req.body; // Get email and password from request body
+  // console.log("Login attempt with email:", email); // Log the email for debugging
+  try {
+    const user = await User.findOne({ email });
+
+    if (!user) {
+      return res
+        .status(400)
+        .json({ success: false, error: "Invalid credentials" });
+    }
+
+    const isPasswordValid = await bcryptjs.compare(password, user.password); // Compare provided password with stored hashed password
+    if (!isPasswordValid) {
+      return res
+        .status(400)
+        .json({ success: false, error: "Invalid credentials" });
+    }
+
+    // Generate JWT and set cookie
+    generateTokenAndSetCookie(res, user._id);
+
+    user.lastLogin = Date.now();
+    await user.save(); // Save last login time
+
+    res.status(200).json({
+      success: true,
+      message: "Logged in successfully",
+      user: {
+        ...user._doc,
+        password: undefined, // Exclude password from response
+      },
+    });
+  } catch (error) {
+    console.error("Login error:", error);
+    return res
+      .status(500)
+      .json({ success: false, error: "Internal server error" });
+  }
 };
 
 export const logout = async (req, res) => {

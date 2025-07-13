@@ -1,8 +1,6 @@
-
 import { Check, X } from "lucide-react";
 
 const PasswordCriteria = ({ password }) => {
-
     const criteria = [
         { label: "At least 6 characters", met: password.length >= 6 },
         { label: "At least 1 uppercase letter", met: /[A-Z]/.test(password) },
@@ -13,23 +11,21 @@ const PasswordCriteria = ({ password }) => {
 
     return (
         <div className="mt-2 space-y-1">
-            {criteria.map((item, index) => (
+            {criteria.map((item) => (
                 <div key={item.label} className="flex items-center text-xs">
                     {item.met ? (
                         <Check className="size-4 text-green-500 mr-2" />
                     ) : (
-                        <X className="size-4 text-red-500 mr-2" />
+                        <X className="size-4 text-gray-400 mr-2" />
                     )}
-                    <span className={`line-clamp-1 ${item.met ? 'text-gray-500' : 'text-red-400'}`}>
+                    <span className={item.met ? 'text-green-500' : 'text-gray-400'}>
                         {item.label}
                     </span>
                 </div>
             ))}
         </div>
-    )
-
-}
-
+    );
+}; // Added missing semicolon
 
 const PasswordStrengthMeter = ({ password }) => {
     const getStrength = (pass) => {
@@ -40,6 +36,7 @@ const PasswordStrengthMeter = ({ password }) => {
         if (pass.match(/[^a-zA-Z\d]/)) strength++;
         return strength;
     };
+    
     const strength = getStrength(password);
 
     const getColor = (strength) => {
@@ -69,16 +66,16 @@ const PasswordStrengthMeter = ({ password }) => {
                 {[...Array(4)].map((_, index) => (
                     <div
                         key={index}
-                        className={`h-1 w-1/4 rounded-full transition-colors duration-300 
-                ${index < strength ? getColor(strength) : "bg-gray-600"}
-              `}
+                        className={`h-1 w-1/4 rounded-full transition-colors duration-300 ${
+                            index < strength ? getColor(strength) : "bg-gray-600"
+                        }`}
                     />
                 ))}
             </div>
             <PasswordCriteria password={password} />
         </div>
-    )
-}
+    );
+};
 
 export default PasswordStrengthMeter;
 

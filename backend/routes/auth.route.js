@@ -15,7 +15,7 @@ const router = express.Router();
 router.get('/check-auth', verifyToken, checkAuth);
 
 router.post('/signup', signup);
-
+console.log("login route");
 router.post("/login", login);
 
 router.post("/logout", logout);
