@@ -6,6 +6,7 @@ const API_URL =
     ? "http://localhost:5000/api/auth"
     : "/api/auth";
 
+    
 axios.defaults.withCredentials = true;
 
 export const useAuthStore = create((set) => ({
@@ -135,7 +136,7 @@ export const useAuthStore = create((set) => ({
       set({
         isLoading: false,
         error:
-          error.response?.data?.message || "Error sending reset password email", // ✅ Fixed: Added optional chaining
+          error.response.data.message || "Error sending reset password email", // ✅ Fixed: Added optional chaining
       });
       throw error;
     }
