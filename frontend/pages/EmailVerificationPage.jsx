@@ -1,6 +1,6 @@
 import { useEffect, useRef, useState } from "react";
 import { useNavigate } from "react-router-dom";
-import { motion } from "framer-motion"; 
+import { motion } from "framer-motion";
 import toast from "react-hot-toast";
 import { useAuthStore } from "../store/authStore";
 
@@ -39,6 +39,7 @@ const EmailVerificationPage = () => {
 
   const handleKeyDown = (index, e) => {
     if (e.key === "Backspace" && !code[index] && index > 0) {
+      console.log("Backspace pressed on empty input at index:", index);
       inputRefs.current[index - 1].focus();
     }
   };
@@ -46,12 +47,16 @@ const EmailVerificationPage = () => {
   const handleSubmit = async (e) => {
     e.preventDefault();
     const verificationCode = code.join("");
+
+    console.log("Page Submitting verification code:", verificationCode);
+
     try {
       await verifyEmail(verificationCode);
+      toast.success("Email verified successfully!");
       navigate("/");
-      toast.success("Email verified successfully");
     } catch (error) {
       console.log(error);
+      toast.error("Verification failed. Please try again.");
     }
   };
 

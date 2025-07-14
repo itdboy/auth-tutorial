@@ -40,17 +40,21 @@ export const useAuthStore = create((set) => ({
 
   login: async (email, password) => {
     set({ isLoading: true, error: null });
+   
     try {
       const response = await axios.post(`${API_URL}/login`, {
         email,
         password,
       });
+
+       
       set({
         isAuthenticated: true,
         user: response.data.user,
         error: null,
         isLoading: false,
       });
+      
     } catch (error) {
       set({
         error: error.response?.data?.message || "Error logging in",
@@ -79,6 +83,7 @@ export const useAuthStore = create((set) => ({
   verifyEmail: async (verificationCode) => {
     set({ isLoading: true, error: null });
     try {
+      console.log("Verifying email with code:", verificationCode); // Debugging log
       const response = await axios.post(`${API_URL}/verify-email`, {
         verificationCode,
       });
@@ -87,6 +92,8 @@ export const useAuthStore = create((set) => ({
         isAuthenticated: true,
         isLoading: false,
       });
+
+      //? ปกติ เมื่อคืนค่าแล้วจะไม่ต้อง return อะไร แต่ถ้าต้องการให้มีค่า return ก็สามารถทำได้
       return response.data;
     } catch (error) {
       set({
@@ -97,10 +104,16 @@ export const useAuthStore = create((set) => ({
     }
   },
 
+  
+
   checkAuth: async () => {
+    // หน่วยเวลาการตรวจสอบการยืนยันตัวตน
+    // await new Promise((resolve) => setTimeout(resolve, 2000)); // Simulate delay
+
     set({ isCheckingAuth: true, error: null });
     try {
-      const response = await axios.get(`${API_URL}/check-auth`);
+       const response = await axios.get(`${API_URL}/check-auth`);
+     
       set({
         user: response.data.user,
         isAuthenticated: true,

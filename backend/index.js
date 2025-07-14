@@ -19,7 +19,7 @@ app.use(cookieParser()); // Middleware to parse cookies
 // app.get('/', (req, res) => {
 //     res.send('Hello, World 555!');
 // })
-console.log("backend/index.js");
+console.log("index.js is running");
 app.use("/api/auth", authRoutes) // Use the auth routes for authentication-related endpoints
 
 app.listen(PORT, () => {

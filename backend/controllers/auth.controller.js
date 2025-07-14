@@ -70,15 +70,15 @@ export const login = async (req, res) => {
     if (!user) {
       return res
         .status(400)
-        .json({ success: false, error: "Invalid credentials" });
+        .json({ success: false, message: "Invalid credentials" });
     }
 
-    const isPasswordValid = await bcryptjs.compare(password, user.password); // Compare provided password with stored hashed password
+    const isPasswordValid = await bcryptjs.compare(password, user.password);
     if (!isPasswordValid) {
-      return res
-        .status(400)
-        .json({ success: false, error: "Invalid credentials" });
+      return res.status(400).json({ success: false, message: "Invalid credentials" });
     }
+
+
 
     // Generate JWT and set cookie
     generateTokenAndSetCookie(res, user._id);
@@ -110,6 +110,8 @@ export const logout = async (req, res) => {
 export const verifyEmail = async (req, res) => {
   // Simulate email verification logic
   const { code } = req.body; // Get the verification code from the request body
+  console.log("Verification code received:", code); // Log the verification code for debugging
+  
   try {
     const user = await User.findOne({
       verificationToken: code, // Find user by verification token
@@ -119,7 +121,7 @@ export const verifyEmail = async (req, res) => {
     if (!user) {
       return res
         .status(400)
-        .json({ error: "Invalid or expired verification code" });
+        .json({ message: "Invalid or expired verification code" });
     }
 
     user.isVerified = true;
@@ -129,10 +131,17 @@ export const verifyEmail = async (req, res) => {
 
     await sendWelcomeEmail(user.email, user.name); // Simulate sending a welcome email
 
-    res.status(200).json({ message: "Email verified successfully" });
+    res.status(200).json({ 
+      success: true,
+      message: "Email verified successfully",
+      user: {
+        ...user._doc,
+        password: undefined // Exclude password from response
+      }
+    });
   } catch (error) {
     console.error("Email verification error:", error);
-    res.status(500).json({ error: "Internal server error" });
+    res.status(500).json({ message: "Internal server error" });
   }
 };
 
@@ -202,6 +211,7 @@ export const resetPassword = async (req, res) => {
 
 export const checkAuth = async (req, res) => {
   try {
+    console.log("- checkAuth Checking authentication status for user ID:", req.userId);
     const user = await User.findById(req.userId).select("-password"); // Find the user by ID and exclude the password field
 
     if (!user) {

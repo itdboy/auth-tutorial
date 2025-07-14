@@ -6,6 +6,7 @@ import EmailVerificationPage from "../pages/EmailVerificationPage";
 import { useAuthStore } from "../store/authStore";
 import { useEffect } from "react";
 import { DashboardPage } from "../pages/DashboardPage";
+import LoadingSpinner from "../components/LoadingSpinner";
 
 //protect routes with authentication
 const ProtectedRoute = ({ children }) => {
@@ -25,7 +26,7 @@ const ProtectedRoute = ({ children }) => {
 //redirect authenticated users to home
 const RedirectAuthenticatedUser = ({ children }) => {
   const { isAuthenticated, user } = useAuthStore();
-
+  // console.log(  "RedirectAuthenticatedUser - isAuthenticated:", isAuthenticated, user);
   if (isAuthenticated && user?.isVerified) {
     return <Navigate to="/" replace />;
   }
@@ -34,6 +35,7 @@ const RedirectAuthenticatedUser = ({ children }) => {
 };
 
 function App() {
+
   const { isCheckingAuth, checkAuth } = useAuthStore();
 
   useEffect(() => {
@@ -41,7 +43,7 @@ function App() {
   }, [checkAuth]);
 
   // Uncomment this when you have a LoadingSpinner component
-  // if (isCheckingAuth) return <LoadingSpinner />;
+  if (isCheckingAuth) return <LoadingSpinner />;
 
   return (
     <div className="min-h-screen bg-gradient-to-br from-gray-900 via-green-900 to-emerald-900 flex items-center justify-center relative overflow-hidden">
